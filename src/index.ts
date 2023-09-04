@@ -139,12 +139,22 @@ async function signCookie(value: string, secret: string): Promise<string> {
   return `s:${value}.${b64Signature}`
 }
 
+function validateConfig<SessionDataT>(config: H3SessionOptions<SessionDataT>) {
+  if (!config.store) {
+    throw new Error('[h3-session] Session store is required!')
+  }
+
+  if (!config.secret) {
+    throw new Error('[h3-session] Session secret is required!')
+  }
+}
+
 /**
  * Attach a session to an H3Event
  * @param event
  * @param config
  */
-export async function useSession<SessionDataT = any>(
+export async function useSession<SessionDataT extends object = any>(
   event: H3Event,
   config: H3SessionOptions<SessionDataT>,
 ) {
@@ -152,6 +162,8 @@ export async function useSession<SessionDataT = any>(
   if (event.context.session) {
     return
   }
+
+  validateConfig<SessionDataT>(config)
 
   // Populate default config values
   const sessionConfig = defu(config, {
@@ -166,14 +178,6 @@ export async function useSession<SessionDataT = any>(
 
   const { store } = sessionConfig
 
-  if (!store) {
-    throw new Error('[h3-session] Session store is required!')
-  }
-
-  if (!sessionConfig.secret) {
-    throw new Error('[h3-session] Session secret is required!')
-  }
-
   const generate = async () => {
     return await Promise.resolve({
       id: sessionConfig.genid(event),
@@ -183,7 +187,7 @@ export async function useSession<SessionDataT = any>(
 
   const createSessionCookie = async (
     sid: string,
-    data: RawSession<SessionDataT>,
+    data: SessionDataT | RawSession<SessionDataT>,
   ): Promise<SessionCookie> => {
     let signedCookie: string
 
@@ -192,7 +196,7 @@ export async function useSession<SessionDataT = any>(
       // Default to a max age of one day
       maxAge: sessionConfig.cookie.maxAge || 60 * 60 * 24,
       // Copy cookie properties from the saved session
-      ...data.cookie,
+      ...('cookie' in data ? data.cookie : {}),
       setSessionId: async (sid: string) => {
         signedCookie = await signCookie(
           sid,
@@ -225,7 +229,7 @@ export async function useSession<SessionDataT = any>(
   const rawCookie = getCookie(event, sessionConfig.name)
 
   // Extract the ID from the cookie
-  let sessionId = rawCookie
+  const sessionId = rawCookie
     ? await unsignCookie(rawCookie, normalizedSecrets)
     : null
 
@@ -236,44 +240,57 @@ export async function useSession<SessionDataT = any>(
     sessionData = await store.get(sessionId)
   }
 
-  // Create the session data and a new ID if it does not exist
-  if (!sessionId || !sessionData) {
+  async function createNewSession() {
     const { id, data } = await generate()
-    sessionId = id
-    sessionData = { ...data, cookie: undefined }
+    const cookie = await createSessionCookie(id, data)
+
+    event.context.session = new Session<SessionDataT>(
+      id,
+      data,
+      store,
+      generate,
+      cookie,
+    )
+
     if (sessionConfig.saveUninitialized) {
-      await store.set(sessionId, sessionData)
+      await event.context.session.save()
     }
-  } else if (store.touch) {
-    // touch existing sessions to refresh their TTLs
-    await store.touch(sessionId, sessionData)
+
+    // Set sessionId on event context
+    event.context.sessionId = id
   }
 
-  const cookie = await createSessionCookie(sessionId, sessionData)
+  async function createExistingSession(
+    id: string,
+    data: RawSession<SessionDataT>,
+  ) {
+    const cookie = await createSessionCookie(id, data)
 
-  // Build a session object with the session data
-  const session = new Session<SessionDataT>(
-    sessionId,
-    sessionData,
-    store,
-    generate,
-    cookie,
-  )
+    if (store.touch) {
+      // touch existing sessions to refresh their TTLs
+      await store.touch(id, data)
+    }
 
-  // Set session on event context
-  event.context.session = session
-  event.context.sessionId = sessionId
+    event.context.session = new Session<SessionDataT>(
+      id,
+      data,
+      store,
+      generate,
+      cookie,
+    )
+    // Set sessionId on event context
+    event.context.sessionId = id
+  }
+
+  // Create the session data and a new ID if it does not exist
+  if (!sessionId || !sessionData) {
+    await createNewSession()
+  } else {
+    await createExistingSession(sessionId, sessionData)
+  }
+
   // expose session store
   event.context.sessionStore = store
-
-  // TODO: Auto-save the session at the end of the request
-  // Depends on h3 1.8.0
-  // Needs to be registered in nuxt options?
-  // https://github.com/unjs/h3/pull/482
-  // onAfterResponse(async () => {
-  //   // check for changes?
-  //   await session.save()
-  // })
 }
 
 export * from './session'
