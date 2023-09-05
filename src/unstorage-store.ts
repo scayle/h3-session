@@ -76,11 +76,6 @@ export class UnstorageSessionStore<SessionDataT extends object>
 
   /**
    * Fetch all saved sessions.
-   *
-   * Note: This should be used carefully with large redis databases.
-   * Both Redis 6 and ElastiCache have limit of 1M items on bulk commands.
-   * For bulk operations then, it is better to use the redis client directly,
-   * and split the operation into chunks.
    */
   async all() {
     const keys = await this.getAllKeys()
