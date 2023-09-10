@@ -30,7 +30,7 @@
     "@changesets/types": "5.2.1",
     "@scayle/eslint-config-storefront": "3.2.3",
     "@scayle/prettier-config-storefront": "2.0.1",
-    "eslint": "8.48.0",
+    "eslint": "8.49.0",
     "eslint-formatter-gitlab": "5.0.0",
     "h3": "1.7.1",
     "typescript": "5.2.2",
