@@ -44,19 +44,15 @@ interface H3SessionOptions<SessionDataT> {
   name?: string
 
   // Function to generate session ID. Defaults to randomUUID
-  genid: (event: H3Event) => string
+  genid?: (event: H3Event) => string
 
   // Function for generating new session data
   generate?: () => SessionDataT
 
-  // proxy?: boolean
-
-  // resave, rolling,
-  saveUninitialized: boolean
+  proxy?: boolean
+  saveUninitialized?: boolean
 
   secret: string | string[]
-
-  // unset: 'destroy' | 'keep'
 }
 
 /**
