@@ -26,10 +26,12 @@ export interface SessionStore<SessionDataT> {
 }
 
 interface H3SessionOptions<SessionDataT> {
+  // Where session data will be stored
   store: SessionStore<SessionDataT>
 
   // Settings for configuring the session cookie
-  // The default value is { path: '/', httpOnly: true, secure: true, maxAge: null, name: 'connect.sid' }.
+  // Cookies are serialized with [`cookie-es`](https://github.com/unjs/cookie-es).
+  // The default value is { path: '/', httpOnly: true, secure: true, maxAge: null }.
   cookie?: {
     domain?: string
     expires?: Date
@@ -40,18 +42,19 @@ interface H3SessionOptions<SessionDataT> {
     secure?: boolean
   }
 
-  // The name of the session cookie
+  // The name of the session cookie. Defaults to 'connect.sid'
   name?: string
 
-  // Function to generate session ID. Defaults to randomUUID
+  // Function to generate a session ID. Defaults to randomUUID
   genid?: (event: H3Event) => string
 
-  // Function for generating new session data
+  // Function to generate new session data
   generate?: () => SessionDataT
 
-  proxy?: boolean
+  // Should the session be automatically saved on initialization?
   saveUninitialized?: boolean
 
+  // Secret(s) to use for cookie signing
   secret: string | string[]
 }
 
