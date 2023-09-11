@@ -38,9 +38,9 @@ export default defineEventHandler(async (event) => {
 The following options can be passed as the second argument to `useSession`. `store` and `secret` must be defined.
 
 ```ts
-interface H3SessionOptions<SessionDataT> {
+interface H3SessionOptions {
   // Where session data will be stored
-  store: SessionStore<SessionDataT>
+  store: SessionStore
 
   // Settings for configuring the session cookie
   // Cookies are serialized with [`cookie-es`](https://github.com/unjs/cookie-es).
@@ -102,8 +102,23 @@ Any object implementing the `SessionStore` interface can be used as the `store` 
 
 There is an included `UnstorageSessionStore` class to create `SessionStore` backed by an [`unstorage`](https://unstorage.unjs.io/) provider. To avoid accumulating dead sessions, use a driver (such as redis) which supports the `ttl` option.
 
+A reference to the store is added to `event.context.sessionStore` to enable manual management of the session data. (e.g. clearing all saved sessions)
+
 ## Cookie signing
 
 The value of the session cookie is a signed variant of the session's ID. The format is `s:[sessionID].[signature]`. e.g. `s:7247d6e9-8ddb-4005-988b-9aa82bd7d6d5.lERU16bdv6tojUNeM8V2UOARyNxHNaWKIYi4bLRxx7o`. This matches the format used by `express-session`, so existing sessions can be preserved when migrating.
 
 The secret used for signing cookies is set in the options of `useSession`. It can be a `string` or `string[]`. When specified as an array, the last item will be used for signing new session cookies, but all secrets will be used to verify existing cookies. This allows changing the signing secret without invalidating existing sessions.
+
+## Typing
+
+The type of the session data can be specified by augmenting the `SessionDataT` interface.
+
+```ts
+declare module '@scayle/h3-session' {
+  export interface SessionDataT {
+    userId: string
+    token: string
+  }
+}
+```

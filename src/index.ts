@@ -10,24 +10,26 @@ export type SessionCookie = SessionCookieOptions & {
   setSessionId(sid: string): Promise<void>
 }
 
+export interface SessionDataT extends Object {}
+
 // The session as saved in the store, without any methods added
-export type RawSession<SessionDataT> = SessionDataT & {
+export type RawSession = SessionDataT & {
   cookie?: SessionCookieOptions
 }
 
-export interface SessionStore<SessionDataT> {
-  all?: () => Promise<RawSession<SessionDataT>[]>
+export interface SessionStore {
+  all?: () => Promise<RawSession[]>
   destroy: (sid: string) => Promise<void>
   clear?: () => Promise<void>
   length?: () => Promise<number>
-  get: (sid: string) => Promise<RawSession<SessionDataT> | undefined>
-  set: (sid: string, data: RawSession<SessionDataT>) => Promise<void>
+  get: (sid: string) => Promise<RawSession | undefined>
+  set: (sid: string, data: RawSession) => Promise<void>
   touch: (sid: string, data: SessionDataT) => Promise<void>
 }
 
-interface H3SessionOptions<SessionDataT> {
+interface H3SessionOptions {
   // Where session data will be stored
-  store: SessionStore<SessionDataT>
+  store: SessionStore
 
   // Settings for configuring the session cookie
   // Cookies are serialized with [`cookie-es`](https://github.com/unjs/cookie-es).
@@ -56,6 +58,14 @@ interface H3SessionOptions<SessionDataT> {
 
   // Secret(s) to use for cookie signing
   secret: string | string[]
+}
+
+declare module 'h3' {
+  export interface H3EventContext {
+    session: Session
+    sessionId: string
+    sessionStore: SessionStore
+  }
 }
 
 /**
@@ -138,7 +148,7 @@ async function signCookie(value: string, secret: string): Promise<string> {
   return `s:${value}.${b64Signature}`
 }
 
-function validateConfig<SessionDataT>(config: H3SessionOptions<SessionDataT>) {
+function validateConfig(config: H3SessionOptions) {
   if (!config.store) {
     throw new Error('[h3-session] Session store is required!')
   }
@@ -153,16 +163,13 @@ function validateConfig<SessionDataT>(config: H3SessionOptions<SessionDataT>) {
  * @param event
  * @param config
  */
-export async function useSession<SessionDataT extends object = any>(
-  event: H3Event,
-  config: H3SessionOptions<SessionDataT>,
-) {
+export async function useSession(event: H3Event, config: H3SessionOptions) {
   // Skip if session is already attached
   if (event.context.session) {
     return
   }
 
-  validateConfig<SessionDataT>(config)
+  validateConfig(config)
 
   // Populate default config values
   const sessionConfig = defu(config, {
@@ -186,7 +193,7 @@ export async function useSession<SessionDataT extends object = any>(
 
   const createSessionCookie = async (
     sid: string,
-    data: SessionDataT | RawSession<SessionDataT>,
+    data: SessionDataT | RawSession,
   ): Promise<SessionCookie> => {
     let signedCookie: string
 
@@ -233,7 +240,7 @@ export async function useSession<SessionDataT extends object = any>(
     : null
 
   // Load the session data from the store
-  let sessionData: RawSession<SessionDataT> | undefined
+  let sessionData: RawSession | undefined
 
   if (sessionId) {
     sessionData = await store.get(sessionId)
@@ -243,13 +250,7 @@ export async function useSession<SessionDataT extends object = any>(
     const { id, data } = await generate()
     const cookie = await createSessionCookie(id, data)
 
-    event.context.session = new Session<SessionDataT>(
-      id,
-      data,
-      store,
-      generate,
-      cookie,
-    )
+    event.context.session = new Session(id, data, store, generate, cookie)
 
     if (sessionConfig.saveUninitialized) {
       await event.context.session.save()
@@ -259,10 +260,7 @@ export async function useSession<SessionDataT extends object = any>(
     event.context.sessionId = id
   }
 
-  async function createExistingSession(
-    id: string,
-    data: RawSession<SessionDataT>,
-  ) {
+  async function createExistingSession(id: string, data: RawSession) {
     const cookie = await createSessionCookie(id, data)
 
     if (store.touch) {
@@ -270,13 +268,7 @@ export async function useSession<SessionDataT extends object = any>(
       await store.touch(id, data)
     }
 
-    event.context.session = new Session<SessionDataT>(
-      id,
-      data,
-      store,
-      generate,
-      cookie,
-    )
+    event.context.session = new Session(id, data, store, generate, cookie)
     // Set sessionId on event context
     event.context.sessionId = id
   }

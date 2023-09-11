@@ -1,23 +1,21 @@
 import type { Storage } from 'unstorage'
 import type { SessionStore, RawSession } from './index'
 
-type TTL<SessionDataT> = number | ((data: RawSession<SessionDataT>) => number)
+type TTL = number | ((data: RawSession) => number)
 
-interface UnstorageSessionStoreOptions<SessionDataT> {
+interface UnstorageSessionStoreOptions {
   prefix: string
-  ttl: TTL<SessionDataT>
+  ttl: TTL
 }
 
-export class UnstorageSessionStore<SessionDataT extends object>
-  implements SessionStore<SessionDataT>
-{
-  storage: Storage<RawSession<SessionDataT>>
+export class UnstorageSessionStore implements SessionStore {
+  storage: Storage<RawSession>
   prefix: string
-  ttl: TTL<SessionDataT>
+  ttl: TTL
 
   constructor(
-    storage: Storage<SessionDataT>,
-    options?: Partial<UnstorageSessionStoreOptions<SessionDataT>>,
+    storage: Storage,
+    options?: Partial<UnstorageSessionStoreOptions>,
   ) {
     this.storage = storage
     this.prefix = options?.prefix ?? 'sess'
@@ -46,7 +44,7 @@ export class UnstorageSessionStore<SessionDataT extends object>
    * @param sid the un-prefixed session ID
    * @param data the session data
    */
-  async set(sid: string, data: RawSession<SessionDataT>) {
+  async set(sid: string, data: RawSession) {
     const ttl = this.getTTL(data)
 
     if (ttl > 0) {
@@ -61,7 +59,7 @@ export class UnstorageSessionStore<SessionDataT extends object>
    * @param sid the un-prefixed session ID
    * @param data the session data
    */
-  async touch(sid: string, data: RawSession<SessionDataT>) {
+  async touch(sid: string, data: RawSession) {
     // For now, it seems the best way to bump the TTL through the unstorage
     // interface is by re-saving the data
     await this.set(sid, data)
@@ -82,7 +80,7 @@ export class UnstorageSessionStore<SessionDataT extends object>
     const values = await this.storage.getItems(keys)
 
     return values.map(({ value }) => {
-      return value as RawSession<SessionDataT>
+      return value as RawSession
     })
   }
 
@@ -108,7 +106,7 @@ export class UnstorageSessionStore<SessionDataT extends object>
    * @param session
    * @private
    */
-  private getTTL(session: RawSession<SessionDataT>) {
+  private getTTL(session: RawSession) {
     if (typeof this.ttl === 'function') {
       return this.ttl(session)
     }

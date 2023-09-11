@@ -1,4 +1,4 @@
-import type { SessionStore, SessionCookie } from './index'
+import type { SessionStore, SessionCookie, SessionDataT } from './index'
 
 export interface SessionMethods {
   save: () => Promise<void>
@@ -7,11 +7,9 @@ export interface SessionMethods {
   regenerate: () => Promise<void>
 }
 
-export type SessionT<SessionDataT> = SessionDataT & SessionMethods
-
-export class Session<SessionDataT> implements SessionMethods {
+export class Session implements SessionMethods {
   #id: string
-  #store: SessionStore<SessionDataT>
+  #store: SessionStore
   data: SessionDataT
   #generate: () => Promise<{ id: string; data: SessionDataT }>
   cookie: SessionCookie
@@ -19,7 +17,7 @@ export class Session<SessionDataT> implements SessionMethods {
   constructor(
     id: string,
     data: SessionDataT,
-    store: SessionStore<SessionDataT>,
+    store: SessionStore,
     generate: () => Promise<{ id: string; data: SessionDataT }>,
     cookie: SessionCookie,
   ) {
