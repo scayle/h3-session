@@ -1,5 +1,15 @@
 # @scayle/h3-session
 
+## 0.3.0
+
+### Minor Changes
+
+- Support typing the session data
+
+### Patch Changes
+
+- Remove unused proxy option
+
 ## 0.2.1
 
 ### Patch Changes
