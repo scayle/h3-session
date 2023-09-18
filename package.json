@@ -1,6 +1,6 @@
 {
   "name": "@scayle/h3-session",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Persistent sessions for h3",
   "license": "ISC",
   "exports": {
@@ -28,7 +28,7 @@
   },
   "devDependencies": {
     "@changesets/types": "5.2.1",
-    "@scayle/eslint-config-storefront": "3.2.3",
+    "@scayle/eslint-config-storefront": "3.2.4",
     "@scayle/prettier-config-storefront": "2.0.1",
     "eslint": "8.49.0",
     "eslint-formatter-gitlab": "5.0.0",

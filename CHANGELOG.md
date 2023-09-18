@@ -1,5 +1,11 @@
 # @scayle/h3-session
 
+## 0.3.1
+
+### Patch Changes
+
+- raise required h3 peerDependency version to v1.8.0 and use only fixed dependencies
+
 ## 0.3.0
 
 ### Minor Changes
