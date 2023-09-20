@@ -1,5 +1,11 @@
 # @scayle/h3-session
 
+## 0.3.2
+
+### Patch Changes
+
+- Fix loading sessions created by express-session
+
 ## 0.3.1
 
 ### Patch Changes
