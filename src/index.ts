@@ -191,18 +191,13 @@ export async function useSession(event: H3Event, config: H3SessionOptions) {
     })
   }
 
-  const createSessionCookie = async (
-    sid: string,
-    data: SessionDataT | RawSession,
-  ): Promise<SessionCookie> => {
+  const createSessionCookie = async (sid: string): Promise<SessionCookie> => {
     let signedCookie: string
 
     const cookie = {
       ...sessionConfig.cookie,
       // Default to a max age of one day
       maxAge: sessionConfig.cookie.maxAge || 60 * 60 * 24,
-      // Copy cookie properties from the saved session
-      ...('cookie' in data ? data.cookie : {}),
       setSessionId: async (sid: string) => {
         signedCookie = await signCookie(
           sid,
@@ -248,7 +243,7 @@ export async function useSession(event: H3Event, config: H3SessionOptions) {
 
   async function createNewSession() {
     const { id, data } = await generate()
-    const cookie = await createSessionCookie(id, data)
+    const cookie = await createSessionCookie(id)
 
     event.context.session = new Session(id, data, store, generate, cookie)
 
@@ -261,7 +256,7 @@ export async function useSession(event: H3Event, config: H3SessionOptions) {
   }
 
   async function createExistingSession(id: string, data: RawSession) {
-    const cookie = await createSessionCookie(id, data)
+    const cookie = await createSessionCookie(id)
 
     if (store.touch) {
       // touch existing sessions to refresh their TTLs
