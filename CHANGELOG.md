@@ -1,5 +1,11 @@
 # @scayle/h3-session
 
+## 0.3.3
+
+### Patch Changes
+
+- New cookie settings should apply to existing cookies
+
 ## 0.3.2
 
 ### Patch Changes
