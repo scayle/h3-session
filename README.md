@@ -1,6 +1,23 @@
 # @scayle/h3-session
 
-Persistent sessions for h3. Based on [express-session](https://www.npmjs.com/package/express-session).
+[![npm version][npm-version-src]][npm-version-href]
+[![npm downloads][npm-downloads-src]][npm-downloads-href]
+[![License][license-src]][license-href]
+
+Persistent sessions for [h3](https://github.com/unjs/h3). Based on [express-session](https://www.npmjs.com/package/express-session).
+
+## Installation
+
+```bash
+# Using pnpm
+pnpm add @scayle/h3-session
+
+# Using yarn
+yarn add @scayle/h3-session
+
+# Using npm
+npm install @scayle/h3-session
+```
 
 ## Usage
 
@@ -122,3 +139,12 @@ declare module '@scayle/h3-session' {
   }
 }
 ```
+
+<!-- Badges -->
+
+[npm-version-src]: https://img.shields.io/npm/v/@scayle/h3-session/latest.svg?style=flat&colorA=18181B&colorB=28CF8D
+[npm-version-href]: https://npmjs.com/package/@scayle/h3-session
+[npm-downloads-src]: https://img.shields.io/npm/dm/@scayle/h3-session.svg?style=flat&colorA=18181B&colorB=28CF8D
+[npm-downloads-href]: https://npmjs.com/package/@scayle/h3-session
+[license-src]: https://img.shields.io/npm/l/@scayle/h3-session.svg?style=flat&colorA=18181B&colorB=28CF8D
+[license-href]: https://npmjs.com/package/@scayle/h3-session
