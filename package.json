@@ -4,6 +4,10 @@
   "description": "Persistent sessions for h3",
   "author": "SCAYLE Commerce Engine",
   "license": "MIT",
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
   "exports": {
     ".": "./dist/index.js"
   },
