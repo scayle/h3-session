@@ -1,5 +1,11 @@
 # @scayle/h3-session
 
+## 0.3.4
+
+### Patch Changes
+
+- Add license file
+
 ## 0.3.3
 
 ### Patch Changes
