@@ -33,7 +33,7 @@
     "zod": "3.22.4"
   },
   "devDependencies": {
-    "@changesets/types": "5.2.1",
+    "@changesets/types": "6.0.0",
     "@scayle/eslint-config-storefront": "3.2.5",
     "@scayle/prettier-config-storefront": "2.0.2",
     "eslint": "8.54.0",
