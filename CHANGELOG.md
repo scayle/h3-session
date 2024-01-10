@@ -1,5 +1,11 @@
 # @scayle/h3-session
 
+## 0.3.5
+
+### Patch Changes
+
+- Update to `h3@1.10.1` (_For detailed changes see [Release Notes for unjs/h3 v1.10.0](https://github.com/unjs/h3/releases/tag/v1.10.0)_)
+
 ## 0.3.4
 
 ### Patch Changes
