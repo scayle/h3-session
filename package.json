@@ -18,8 +18,8 @@
   ],
   "scripts": {
     "build": "yarn tsc -p tsconfig.json",
-    "format": "prettier --ignore-unknown --log-level warn --check .",
-    "format:fix": "prettier --ignore-unknown --log-level warn --write .",
+    "format": "dprint check",
+    "format:fix": "dprint fmt",
     "lint": "eslint . --format gitlab",
     "lint:fix": "eslint . --fix"
   },
@@ -35,11 +35,10 @@
   "devDependencies": {
     "@changesets/types": "6.0.0",
     "@scayle/eslint-config-storefront": "3.2.6",
-    "@scayle/prettier-config-storefront": "2.0.2",
+    "dprint": "0.45.0",
     "eslint": "8.57.0",
     "eslint-formatter-gitlab": "5.1.0",
     "h3": "1.11.1",
-    "prettier": "3.0.0",
     "typescript": "5.4.4"
   },
   "volta": {
