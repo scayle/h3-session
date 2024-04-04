@@ -37,8 +37,8 @@ export class Session implements SessionMethods {
   }
 
   async reload() {
-    this.data =
-      (await this.#store.get(this.#id)) ?? (await this.#generate()).data
+    this.data = (await this.#store.get(this.#id)) ??
+      (await this.#generate()).data
   }
 
   async destroy() {
