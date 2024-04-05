@@ -40,7 +40,7 @@
     "eslint-formatter-gitlab": "5.1.0",
     "h3": "1.11.1",
     "prettier": "3.0.0",
-    "typescript": "5.4.3"
+    "typescript": "5.4.4"
   },
   "volta": {
     "node": "20.12.0"
