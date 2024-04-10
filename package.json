@@ -1,6 +1,6 @@
 {
   "name": "@scayle/h3-session",
-  "version": "0.3.5",
+  "version": "0.3.6",
   "description": "Persistent sessions for h3",
   "author": "SCAYLE Commerce Engine",
   "license": "MIT",
@@ -34,7 +34,7 @@
   },
   "devDependencies": {
     "@changesets/types": "6.0.0",
-    "@scayle/eslint-config-storefront": "3.2.6",
+    "@scayle/eslint-config-storefront": "3.2.7",
     "dprint": "0.45.1",
     "eslint": "8.57.0",
     "eslint-formatter-gitlab": "5.1.0",

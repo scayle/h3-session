@@ -1,5 +1,11 @@
 # @scayle/h3-session
 
+## 0.3.6
+
+### Patch Changes
+
+- Format code with dprint
+
 ## 0.3.5
 
 ### Patch Changes
