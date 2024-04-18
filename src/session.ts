@@ -1,4 +1,4 @@
-import type { SessionStore, SessionCookie, SessionDataT } from './index'
+import type { SessionCookie, SessionDataT, SessionStore } from './index'
 
 export interface SessionMethods {
   save: () => Promise<void>

@@ -1,6 +1,6 @@
 import type { Storage } from 'unstorage'
 import { z } from 'zod'
-import type { SessionStore, RawSession } from './index'
+import type { RawSession, SessionStore } from './index'
 
 type TTL = number | ((data: RawSession) => number)
 

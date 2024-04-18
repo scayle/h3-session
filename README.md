@@ -22,7 +22,7 @@ npm install @scayle/h3-session
 ## Usage
 
 ```ts
-import { useSession, UnstorageSessionStore } from '@scayle/h3-session'
+import { UnstorageSessionStore, useSession } from '@scayle/h3-session'
 import { createStorage } from 'unstorage'
 
 const DEFAULT_TTL = 60 * 60 * 24

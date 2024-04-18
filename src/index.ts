@@ -1,15 +1,18 @@
 // A session implementation for h3 based on express-session
-import { H3Event, getCookie, setCookie } from 'h3'
+import { Buffer } from 'node:buffer'
+import type { H3Event } from 'h3'
+import { getCookie, setCookie } from 'h3'
 import { defu } from 'defu'
-import { subtle, randomUUID } from 'uncrypto'
+import { randomUUID, subtle } from 'uncrypto'
 import { Session } from './session'
 
 export type SessionCookieOptions = Parameters<typeof setCookie>[3]
 
 export type SessionCookie = SessionCookieOptions & {
-  setSessionId(sid: string): Promise<void>
+  setSessionId: (sid: string) => Promise<void>
 }
 
+// eslint-disable-next-line ts/ban-types
 export interface SessionDataT extends Object {}
 
 // The session as saved in the store, without any methods added
@@ -191,6 +194,11 @@ export async function useSession(event: H3Event, config: H3SessionOptions) {
     })
   }
 
+  // Secret can be a string or array, normalize to an array
+  const normalizedSecrets = Array.isArray(sessionConfig.secret)
+    ? sessionConfig.secret
+    : [sessionConfig.secret]
+
   const createSessionCookie = async (sid: string): Promise<SessionCookie> => {
     let signedCookie: string
 
@@ -213,18 +221,13 @@ export async function useSession(event: H3Event, config: H3SessionOptions) {
     // We can't hook into the onBeforeResponse, so this is the best alternative
     return new Proxy(cookie, {
       set(target, property, value) {
-        // @ts-ignore
+        // @ts-expect-error Implicitly has type any
         target[property] = value
         setCookie(event, sessionConfig.name, signedCookie, cookie)
         return true
       },
     })
   }
-
-  // Secret can be a string or array, normalize to an array
-  const normalizedSecrets = Array.isArray(sessionConfig.secret)
-    ? sessionConfig.secret
-    : [sessionConfig.secret]
 
   // Check the request for a session cookie
   const rawCookie = getCookie(event, sessionConfig.name)
