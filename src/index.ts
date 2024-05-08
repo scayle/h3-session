@@ -78,7 +78,7 @@ declare module 'h3' {
  * @param value a cookie value in the format `s:[value].[signature]`
  * @param secrets an array of secret strings to verify with
  */
-async function unsignCookie(
+export async function unsignCookie(
   value: string,
   secrets: string[],
 ): Promise<string | false> {
