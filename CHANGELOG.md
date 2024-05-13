@@ -1,5 +1,11 @@
 # @scayle/h3-session
 
+## 0.4.0
+
+### Minor Changes
+
+- Export the `unsignCookie` utility function
+
 ## 0.3.6
 
 ### Patch Changes
