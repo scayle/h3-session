@@ -34,7 +34,7 @@
   },
   "devDependencies": {
     "@changesets/types": "6.0.0",
-    "@scayle/eslint-config-storefront": "4.1.0",
+    "@scayle/eslint-config-storefront": "4.2.0",
     "dprint": "0.45.1",
     "eslint": "9.2.0",
     "eslint-formatter-gitlab": "5.1.0",
