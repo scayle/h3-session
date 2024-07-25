@@ -52,7 +52,7 @@ export class UnstorageSessionStore implements SessionStore {
     if (item && item.cookie) {
       try {
         item.cookie = CookieSchema.parse(item.cookie)
-      } catch (e) {
+      } catch {
         delete item.cookie
       }
     }

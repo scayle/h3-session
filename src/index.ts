@@ -12,8 +12,7 @@ export type SessionCookie = SessionCookieOptions & {
   setSessionId: (sid: string) => Promise<void>
 }
 
-// eslint-disable-next-line ts/ban-types
-export interface SessionDataT extends Object {}
+export interface SessionDataT {}
 
 // The session as saved in the store, without any methods added
 export type RawSession = SessionDataT & {
