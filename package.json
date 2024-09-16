@@ -33,7 +33,6 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
-    "@changesets/types": "6.0.0",
     "@scayle/eslint-config-storefront": "4.3.0",
     "dprint": "0.47.2",
     "eslint": "9.10.0",
