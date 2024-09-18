@@ -140,6 +140,10 @@ declare module '@scayle/h3-session' {
 }
 ```
 
+## License
+
+Licensed under the [MIT License](https://opensource.org/license/mit/)
+
 <!-- Badges -->
 
 [npm-version-src]: https://img.shields.io/npm/v/@scayle/h3-session/latest.svg?style=flat&colorA=18181B&colorB=28CF8D
