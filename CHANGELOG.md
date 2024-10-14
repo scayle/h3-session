@@ -1,5 +1,14 @@
 # @scayle/h3-session
 
+## 0.4.1
+
+### Patch Changes
+
+- Updated dependency `defu@6.1.4` to `defu@^6.1.4`
+- Updated dependency `uncrypto@0.1.3` to `uncrypto@^0.1.3`
+- Updated dependency `unstorage@1.10.2` to `unstorage@^1.10.2`
+- Updated dependency `zod@3.23.5` to `zod@^3.23.8`
+
 ## 0.4.0
 
 ### Minor Changes
