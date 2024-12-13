@@ -9,15 +9,16 @@
     "registry": "https://registry.npmjs.org/"
   },
   "exports": {
-    ".": "./dist/index.js"
+    ".": "./dist/index.mjs"
   },
-  "main": "./dist/index.js",
+  "main": "./dist/index.mjs",
   "files": [
     "CHANGELOG.md",
     "dist/**"
   ],
   "scripts": {
-    "build": "yarn tsc -p tsconfig.json",
+    "build": "unbuild",
+    "verify-packaging": "attw --pack . --profile esm-only",
     "format": "dprint check",
     "format:fix": "dprint fmt",
     "lint": "eslint . --format gitlab",
@@ -33,12 +34,14 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@arethetypeswrong/cli": "0.17.1",
     "@scayle/eslint-config-storefront": "4.4.0",
     "dprint": "0.47.6",
     "eslint": "9.16.0",
     "eslint-formatter-gitlab": "5.1.0",
     "h3": "1.13.0",
-    "typescript": "5.6.3"
+    "typescript": "5.6.3",
+    "unbuild": "3.0.0"
   },
   "volta": {
     "node": "22.12.0"
