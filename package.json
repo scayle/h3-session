@@ -33,7 +33,7 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
-    "@scayle/eslint-config-storefront": "4.3.2",
+    "@scayle/eslint-config-storefront": "4.4.0",
     "dprint": "0.47.6",
     "eslint": "9.16.0",
     "eslint-formatter-gitlab": "5.1.0",
