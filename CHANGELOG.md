@@ -1,5 +1,11 @@
 # @scayle/h3-session
 
+## 0.4.2
+
+### Patch Changes
+
+- Build the package with `unbuild`
+
 ## 0.4.1
 
 ### Patch Changes
