@@ -125,7 +125,18 @@ export async function unsignCookie(
  * @param value
  * @param secret
  */
-async function signCookie(value: string, secret: string): Promise<string> {
+export async function signCookie(
+  value: string,
+  secret: string,
+): Promise<string> {
+  if (!value) {
+    throw new Error('[h3-session] No value was provided!')
+  }
+
+  if (!secret) {
+    throw new Error('[h3-session] No secret was provided!')
+  }
+
   // Convert the value and secret to Uint8Array
   const encoder = new TextEncoder()
   const messageUint8Array = encoder.encode(value)
