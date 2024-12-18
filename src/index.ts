@@ -70,6 +70,28 @@ declare module 'h3' {
   }
 }
 
+const signatureLength = 43
+function parseCookieValue(value: string): [string, string] | undefined {
+  if (value.length < signatureLength + 3) {
+    return undefined
+  }
+
+  const separatorIndex = value.length - signatureLength - 1
+  // Ensure prefix and separator are present
+  if (
+    value.charAt(0) !== 's' ||
+    value.charAt(1) !== ':' ||
+    value.charAt(separatorIndex) !== '.'
+  ) {
+    return undefined
+  }
+
+  return [
+    value.substring(2, separatorIndex),
+    value.substring(separatorIndex + 1),
+  ]
+}
+
 /**
  * Verify that a cookie was signed with one of the secrets
  * If it's valid, return the embedded message
@@ -82,12 +104,12 @@ export async function unsignCookie(
   secrets: string[],
 ): Promise<string | false> {
   // Validate cookie format
-  const matches = /s:([^.]*)\.(.*)/.exec(value)
+  const matches = parseCookieValue(value)
   if (!matches) {
     return false
   }
 
-  const [, message, signature] = matches
+  const [message, signature] = matches
 
   const encoder = new TextEncoder()
 
