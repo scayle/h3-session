@@ -33,7 +33,7 @@ export class Session implements SessionMethods {
   }
 
   async save() {
-    await this.#store.set(this.#id, { ...this.data, cookie: this.cookie })
+    await this.#store.set(this.#id, this.data)
   }
 
   async reload() {

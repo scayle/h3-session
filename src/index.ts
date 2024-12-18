@@ -15,9 +15,7 @@ export type SessionCookie = SessionCookieOptions & {
 export interface SessionDataT {}
 
 // The session as saved in the store, without any methods added
-export type RawSession = SessionDataT & {
-  cookie?: SessionCookieOptions
-}
+export type RawSession = SessionDataT
 
 export interface SessionStore {
   all?: () => Promise<RawSession[]>

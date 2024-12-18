@@ -1,5 +1,4 @@
 import type { Storage } from 'unstorage'
-import { z } from 'zod'
 import type { RawSession, SessionStore } from './index'
 
 type TTL = number | ((data: RawSession) => number)
@@ -8,16 +7,6 @@ interface UnstorageSessionStoreOptions {
   prefix: string
   ttl: TTL
 }
-
-const CookieSchema = z.object({
-  domain: z.string().optional(),
-  expires: z.coerce.date().optional(),
-  httpOnly: z.boolean().optional(),
-  maxAge: z.number().optional(),
-  path: z.string().optional(),
-  sameSite: z.enum(['lax', 'none', 'strict']).or(z.boolean()).optional(),
-  secure: z.boolean().optional(),
-})
 
 export class UnstorageSessionStore implements SessionStore {
   storage: Storage<RawSession>
@@ -47,15 +36,6 @@ export class UnstorageSessionStore implements SessionStore {
    */
   async get(sid: string) {
     const item = await this.storage.getItem(this.getKey(sid))
-
-    // If the cookie saved in the storage is not valid, delete it
-    if (item && item.cookie) {
-      try {
-        item.cookie = CookieSchema.parse(item.cookie)
-      } catch {
-        delete item.cookie
-      }
-    }
 
     return item ?? undefined
   }

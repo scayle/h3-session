@@ -64,7 +64,7 @@ describe('session', () => {
     const spy = vi.spyOn(store, 'set')
 
     session.save()
-    expect(spy).toHaveBeenCalledWith('foo', { cookie, hello: 'world' })
+    expect(spy).toHaveBeenCalledWith('foo', { hello: 'world' })
     expect(spy).toHaveBeenCalledTimes(1)
   })
 
@@ -166,7 +166,7 @@ describe('session', () => {
 
       expect(cookie.maxAge).toBe(DEFAULT_MAX_AGE)
       expect(destroySpy).toHaveBeenCalledWith('foo')
-      expect(setSpy).toHaveBeenCalledWith('bar', { cookie, msg: 'hello' })
+      expect(setSpy).toHaveBeenCalledWith('bar', { msg: 'hello' })
     })
   })
 })
