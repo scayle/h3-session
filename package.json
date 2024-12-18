@@ -22,7 +22,11 @@
     "format": "dprint check",
     "format:fix": "dprint fmt",
     "lint": "eslint . --format gitlab",
-    "lint:fix": "eslint . --fix"
+    "lint:fix": "eslint . --fix",
+    "test": "vitest run",
+    "test:ci": "vitest --run --coverage --reporter=default --reporter=junit --outputFile=./junit.xml",
+    "test:watch": "vitest watch",
+    "typecheck": "tsc --noEmit -p tsconfig.json"
   },
   "peerDependencies": {
     "h3": "^1.10.0"
@@ -41,7 +45,8 @@
     "eslint-formatter-gitlab": "5.1.0",
     "h3": "1.13.0",
     "typescript": "5.6.3",
-    "unbuild": "3.0.1"
+    "unbuild": "3.0.1",
+    "vitest": "2.1.8"
   },
   "volta": {
     "node": "22.12.0"

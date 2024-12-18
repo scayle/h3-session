@@ -29,7 +29,7 @@ export interface SessionStore {
   touch: (sid: string, data: SessionDataT) => Promise<void>
 }
 
-interface H3SessionOptions {
+export interface H3SessionOptions {
   // Where session data will be stored
   store: SessionStore
 
@@ -150,7 +150,7 @@ async function signCookie(value: string, secret: string): Promise<string> {
   return `s:${value}.${b64Signature}`
 }
 
-function validateConfig(config: H3SessionOptions) {
+export function validateConfig(config: H3SessionOptions) {
   if (!config.store) {
     throw new Error('[h3-session] Session store is required!')
   }
