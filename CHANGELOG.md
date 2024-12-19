@@ -1,5 +1,16 @@
 # @scayle/h3-session
 
+## 0.5.0
+
+### Minor Changes
+
+- Cookie metadata is no longer saved in the session store. Previously, `h3-session` stored a copy of the cookie settings in the session store alongside the session data. This has been changed and now only the session data itself is stored. The cookie settings can still be read and manipulated from the `Session` object.
+
+### Patch Changes
+
+- Removed dependency `zod@^3.23.8`
+- Replace regex used for cookie parsing
+
 ## 0.4.2
 
 ### Patch Changes
