@@ -288,22 +288,30 @@ export async function useSession(event: H3Event, config: H3SessionOptions) {
     event.context.sessionId = id
   }
 
-  async function createExistingSession(id: string, data: RawSession) {
+  async function createExistingSession(id: string, data?: RawSession) {
     const cookie = await createSessionCookie(id)
 
-    if (store.touch) {
+    if (store.touch && data) {
       // touch existing sessions to refresh their TTLs
       await store.touch(id, data)
     }
 
-    event.context.session = new Session(id, data, store, generate, cookie)
+    event.context.session = new Session(
+      id,
+      data ?? sessionConfig.generate(),
+      store,
+      generate,
+      cookie,
+    )
     // Set sessionId on event context
     event.context.sessionId = id
   }
 
   // Create the session data and a new ID if it does not exist
-  if (!sessionId || !sessionData) {
+  if (!sessionId) {
     await createNewSession()
+  } else if (!sessionData) {
+    await createExistingSession(sessionId)
   } else {
     await createExistingSession(sessionId, sessionData)
   }
