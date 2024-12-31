@@ -44,7 +44,7 @@
     "eslint-formatter-gitlab": "5.1.0",
     "h3": "1.13.0",
     "typescript": "5.6.3",
-    "unbuild": "3.0.1",
+    "unbuild": "3.2.0",
     "vitest": "2.1.8"
   },
   "volta": {
