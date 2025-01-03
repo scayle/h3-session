@@ -90,6 +90,62 @@ function parseCookieValue(value: string): [string, string] | undefined {
   ]
 }
 
+const _signKeys: Record<string, CryptoKey> = {}
+
+/**
+ * Return a `CryptoKey` that can be used for signing with the provided secret
+ *
+ * @param secret the secret string to sign with
+ */
+async function getCryptoSignKey(secret: string): Promise<CryptoKey> {
+  if (_signKeys[secret]) {
+    return _signKeys[secret]
+  }
+
+  const encoder = new TextEncoder()
+  // Convert the secret to a Uint8Array
+  const keyUint8Array = encoder.encode(secret)
+
+  // Import the secret as a CryptoKey
+  const cryptoKey = await subtle.importKey(
+    'raw',
+    keyUint8Array,
+    { name: 'HMAC', hash: 'SHA-256' },
+    false,
+    ['sign'],
+  )
+  _signKeys[secret] = cryptoKey
+  return cryptoKey
+}
+
+const _verifyKeys: Record<string, CryptoKey> = {}
+
+/**
+ * Return a `CryptoKey` that can be used for verifying with the provided secret
+ *
+ * @param secret the secret string to verify with
+ */
+async function getCryptoVerifyKey(secret: string): Promise<CryptoKey> {
+  if (_verifyKeys[secret]) {
+    return _verifyKeys[secret]
+  }
+
+  const encoder = new TextEncoder()
+  // Convert the secret to a Uint8Array
+  const keyUint8Array = encoder.encode(secret)
+
+  // Import the secret as a CryptoKey
+  const cryptoKey = await subtle.importKey(
+    'raw',
+    keyUint8Array,
+    { name: 'HMAC', hash: 'SHA-256' },
+    false,
+    ['verify'],
+  )
+  _verifyKeys[secret] = cryptoKey
+  return cryptoKey
+}
+
 /**
  * Verify that a cookie was signed with one of the secrets
  * If it's valid, return the embedded message
@@ -110,20 +166,12 @@ export async function unsignCookie(
   const [message, signature] = matches
 
   const encoder = new TextEncoder()
-
   const messageUint8Array = encoder.encode(message)
 
   const signatureUint8Array = Uint8Array.from(Buffer.from(signature, 'base64'))
 
   for (let i = 0; i < secrets.length; i++) {
-    const keyUint8Array = encoder.encode(secrets[i])
-    const cryptoKey = await subtle.importKey(
-      'raw',
-      keyUint8Array,
-      { name: 'HMAC', hash: 'SHA-256' },
-      false,
-      ['verify'],
-    )
+    const cryptoKey = await getCryptoVerifyKey(secrets[i])
 
     const result = await subtle.verify(
       'HMAC',
@@ -160,16 +208,7 @@ export async function signCookie(
   // Convert the value and secret to Uint8Array
   const encoder = new TextEncoder()
   const messageUint8Array = encoder.encode(value)
-  const keyUint8Array = encoder.encode(secret)
-
-  // Import the secret as a CryptoKey
-  const cryptoKey = await subtle.importKey(
-    'raw',
-    keyUint8Array,
-    { name: 'HMAC', hash: 'SHA-256' },
-    false,
-    ['sign'],
-  )
+  const cryptoKey = await getCryptoSignKey(secret)
 
   const signature = await subtle.sign('HMAC', cryptoKey, messageUint8Array)
 
