@@ -71,7 +71,10 @@ export class UnstorageSessionStore implements SessionStore {
    * Remove all saved sessions
    */
   async clear() {
-    return await this.storage.clear(this.prefix)
+    // storage.clear does work when keys may contain a prefix
+    // https://github.com/unjs/unstorage/issues/336
+    const keys = await this.getAllKeys()
+    await Promise.all(keys.map((k) => this.storage.removeItem(k)))
   }
 
   /**
