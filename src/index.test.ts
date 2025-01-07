@@ -1,11 +1,18 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { randomUUID } from 'uncrypto'
 import {
   validateConfig,
   type H3SessionOptions,
   signCookie,
   unsignCookie,
+  useSession,
+  UnstorageSessionStore,
 } from './index'
+import { createStorage } from 'unstorage'
+import MemoryDriver from 'unstorage/drivers/memory'
+import type { H3Event, PlainRequest } from 'h3'
+import { toPlainHandler, createApp, defineEventHandler } from 'h3'
+import { parse } from 'cookie-es'
 
 describe('validateConfig', () => {
   it('should require store to be defined', () => {
@@ -127,5 +134,285 @@ describe('cookie signing', () => {
         await unsignCookie(await signCookie(value, 'mySecret1'), ['mySecret2']),
       ).toBe(false)
     }
+  })
+})
+
+// Testing useSession should be easier in h3 v2 with mockEvent
+// https://github.com/unjs/h3/issues/676
+async function testMiddleware(
+  request: PlainRequest,
+  config: Parameters<typeof useSession>[1],
+): Promise<H3Event> {
+  let event: H3Event | undefined
+  const handler = defineEventHandler(async _event => {
+    await useSession(_event, config)
+    event = _event
+  })
+
+  await toPlainHandler(createApp().use(handler))(request)
+
+  if (!event) {
+    throw new Error('event was not found')
+  }
+
+  return event
+}
+
+describe('useSession', () => {
+  it('should skip the session creation if one already exists', async () => {
+    const store = new UnstorageSessionStore(
+      createStorage({ driver: MemoryDriver() }),
+    )
+    const secret = 'secret'
+    const genid = vi.fn().mockImplementation(() => 'testId')
+
+    const handler = defineEventHandler(async event => {
+      await useSession(event, { store, secret, genid })
+      await useSession(event, { store, secret, genid })
+    })
+
+    await toPlainHandler(createApp().use(handler))({
+      path: '/',
+      method: 'GET',
+      headers: {},
+    })
+
+    expect(genid).toHaveBeenCalledOnce()
+  })
+
+  it('should add a session and sessionId to the context', async () => {
+    const store = new UnstorageSessionStore(
+      createStorage({ driver: MemoryDriver() }),
+    )
+    const secret = 'secret'
+
+    const { context } = await testMiddleware({
+      path: '/',
+      method: 'GET',
+      headers: {},
+    }, { store, secret })
+
+    expect(context.sessionId).toBeDefined()
+    expect(context.session).toBeDefined()
+  })
+
+  it('should read the session id from the cookie', async () => {
+    const store = new UnstorageSessionStore(
+      createStorage({ driver: MemoryDriver() }),
+    )
+    const secret = 'secret'
+    const sessionId = 'asdf123'
+
+    const { context } = await testMiddleware({
+      method: 'GET',
+      path: '/hello/world',
+      headers: {
+        Cookie: `connect.sid=${await signCookie(sessionId, secret)}`,
+      },
+    }, { store, secret })
+
+    expect(context.sessionId).toEqual(sessionId)
+    expect(context.session).toBeDefined()
+    expect(context.session.id).toEqual(sessionId)
+  })
+
+  it('should get the existing session data from storage', async () => {
+    const store = new UnstorageSessionStore(
+      createStorage({ driver: MemoryDriver() }),
+    )
+    const secret = 'secret'
+    const sessionId = 'asdf123'
+
+    store.set(sessionId, { hello: 'world' })
+
+    const { context } = await testMiddleware({
+      method: 'GET',
+      path: '/hello/world',
+      headers: {
+        Cookie: `connect.sid=${await signCookie(sessionId, secret)}`,
+      },
+    }, { store, secret })
+
+    expect(context.sessionId).toBeDefined()
+    // @ts-expect-error the session data is untyped
+    expect(context.session.data.hello).toEqual('world')
+  })
+
+  it('should generate new session data using the provided generator', async () => {
+    const store = new UnstorageSessionStore(
+      createStorage({ driver: MemoryDriver() }),
+    )
+    const secret = 'secret'
+
+    const { context } = await testMiddleware({
+      path: '/',
+      method: 'GET',
+      headers: {},
+    }, {
+      store,
+      secret,
+      generate() {
+        return { hello: 'world' }
+      },
+    })
+
+    expect(context.sessionId).toBeDefined()
+    expect(context.session).toBeDefined()
+    // @ts-expect-error the session data is untyped
+    expect(context.session.data.hello).toEqual('world')
+  })
+
+  it('should generate new session id using the provided generator', async () => {
+    const store = new UnstorageSessionStore(
+      createStorage({ driver: MemoryDriver() }),
+    )
+    const secret = 'secret'
+
+    const { context } = await testMiddleware({
+      path: '/',
+      method: 'GET',
+      headers: {},
+    }, {
+      store,
+      secret,
+      genid() {
+        return 'custom-id'
+      },
+    })
+    expect(context.sessionId).toEqual('custom-id')
+    expect(context.session).toBeDefined()
+  })
+
+  it('should save the session to storage when save is called', async () => {
+    const store = new UnstorageSessionStore(
+      createStorage({ driver: MemoryDriver() }),
+    )
+    const secret = 'secret'
+    const sessionId = 'asdf123'
+
+    const { context } = await testMiddleware({
+      path: '/',
+      method: 'GET',
+      headers: {},
+    }, {
+      store,
+      secret,
+      genid() {
+        return sessionId
+      },
+    })
+
+    expect(await store.get(sessionId)).toEqual(undefined) // not saving unitialized
+
+    // @ts-expect-error the session data is untyped
+    context.session.data.userId = '123'
+    context.session.save()
+
+    expect(await store.get(sessionId)).toEqual({ userId: '123' })
+  })
+
+  it('should save an empty session when saveUnitialized is true', async () => {
+    const store = new UnstorageSessionStore(
+      createStorage({ driver: MemoryDriver() }),
+    )
+    const secret = 'secret'
+    const sessionId = 'asdf123'
+
+    await testMiddleware({
+      path: '/',
+      method: 'GET',
+      headers: {},
+    }, {
+      store,
+      secret,
+      saveUninitialized: true,
+      genid() {
+        return sessionId
+      },
+    })
+
+    expect(await store.get(sessionId)).toEqual({})
+  })
+
+  it('should re-save an existing session to bump the ttl', async () => {
+    const store = new UnstorageSessionStore(
+      createStorage({ driver: MemoryDriver() }),
+    )
+    const secret = 'secret'
+    const sessionId = 'asdf123'
+    const spy = vi.spyOn(store, 'touch')
+
+    await store.set(sessionId, { hello: 'world' })
+
+    await testMiddleware({
+      path: '/',
+      method: 'GET',
+      headers: {
+        Cookie: `connect.sid=${await signCookie(sessionId, secret)}`,
+      },
+    }, {
+      store,
+      secret,
+      saveUninitialized: true,
+    })
+
+    expect(store.touch).toHaveBeenCalledWith(sessionId, { hello: 'world' })
+    spy.mockClear()
+  })
+
+  it('should sign the cookie header with the last secret in the array', async () => {
+    const store = new UnstorageSessionStore(
+      createStorage({ driver: MemoryDriver() }),
+    )
+    const secrets = ['secret', 'newSecret']
+    const sessionId = 'asdf123'
+
+    const signedWithNew = await signCookie(sessionId, secrets[1])
+
+    const event = await testMiddleware({
+      path: '/',
+      method: 'GET',
+      headers: {},
+    }, {
+      store,
+      secret: secrets,
+      saveUninitialized: true,
+      genid() {
+        return sessionId
+      },
+    })
+
+    const parsedSetCookie = parse(
+      event.node.res.getHeaders()['set-cookie']?.[0] ?? '',
+    )
+    expect(parsedSetCookie['connect.sid']).toEqual(signedWithNew)
+  })
+
+  it('should update the set-cookie header when cookie properties are changed', async () => {
+    const store = new UnstorageSessionStore(
+      createStorage({ driver: MemoryDriver() }),
+    )
+    const secret = 'secret'
+    const sessionId = 'asdf123'
+
+    const event = await testMiddleware({
+      path: '/',
+      method: 'GET',
+      headers: {},
+    }, {
+      store,
+      secret,
+      saveUninitialized: true,
+      genid() {
+        return sessionId
+      },
+    })
+
+    expect(event.node.res.getHeaders()['set-cookie']?.length).toEqual(1)
+
+    event.context.session.cookie.path = '/foo'
+    event.context.session.cookie.expires = new Date(Date.now())
+
+    expect(event.node.res.getHeaders()['set-cookie']?.length).toEqual(3)
   })
 })
