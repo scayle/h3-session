@@ -24,7 +24,7 @@
     "lint": "eslint . --format gitlab",
     "lint:fix": "eslint . --fix",
     "test": "vitest run",
-    "test:ci": "vitest --run --coverage --reporter=default --reporter=junit --outputFile=./junit.xml",
+    "test:ci": "vitest --run --coverage --reporter=default --reporter=junit --outputFile=./coverage/junit.xml",
     "test:watch": "vitest watch",
     "typecheck": "tsc --noEmit -p tsconfig.json"
   },
