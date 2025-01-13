@@ -37,7 +37,7 @@
     "unstorage": "^1.10.2"
   },
   "devDependencies": {
-    "@arethetypeswrong/cli": "0.17.2",
+    "@arethetypeswrong/cli": "0.17.3",
     "@scayle/eslint-config-storefront": "4.4.1",
     "cookie-es": "1.2.2",
     "dprint": "0.48.0",
