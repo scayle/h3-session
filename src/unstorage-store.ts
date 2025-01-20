@@ -17,7 +17,7 @@ export class UnstorageSessionStore implements SessionStore {
     storage: Storage,
     options?: Partial<UnstorageSessionStoreOptions>,
   ) {
-    this.storage = storage
+    this.storage = storage as unknown as Storage<RawSession>
     this.prefix = options?.prefix ?? 'sess'
     this.ttl = options?.ttl ?? 60 * 60 * 24
   }
