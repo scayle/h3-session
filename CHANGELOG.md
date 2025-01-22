@@ -1,5 +1,11 @@
 # @scayle/h3-session
 
+## 0.6.0
+
+### Minor Changes
+
+- [Performance] Reduce the calls to `importKey` to improve performance.
+
 ## 0.5.1
 
 ### Patch Changes
