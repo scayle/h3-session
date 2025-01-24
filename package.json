@@ -41,7 +41,7 @@
     "@scayle/eslint-config-storefront": "4.4.1",
     "cookie-es": "1.2.2",
     "dprint": "0.48.0",
-    "eslint": "9.18.0",
+    "eslint": "9.19.0",
     "eslint-formatter-gitlab": "5.1.0",
     "h3": "1.14.0",
     "typescript": "5.7.3",
