@@ -2,12 +2,12 @@ import { describe, expect, it, vi } from 'vitest'
 import { randomUUID } from 'uncrypto'
 import {
   validateConfig,
-  type H3SessionOptions,
   signCookie,
   unsignCookie,
   useSession,
   UnstorageSessionStore,
 } from './index'
+import type { H3SessionOptions } from './index'
 import { createStorage } from 'unstorage'
 import MemoryDriver from 'unstorage/drivers/memory'
 import type { H3Event, PlainRequest } from 'h3'
