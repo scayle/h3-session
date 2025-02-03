@@ -46,7 +46,7 @@
     "h3": "1.14.0",
     "typescript": "5.7.3",
     "unbuild": "3.3.1",
-    "vitest": "2.1.8"
+    "vitest": "2.1.9"
   },
   "volta": {
     "node": "22.13.1"
