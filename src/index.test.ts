@@ -144,12 +144,22 @@ async function testMiddleware(
   config: Parameters<typeof useSession>[1],
 ): Promise<H3Event> {
   let event: H3Event | undefined
+  let error: Error | undefined
+
   const handler = defineEventHandler(async _event => {
-    await useSession(_event, config)
-    event = _event
+    try {
+      await useSession(_event, config)
+      event = _event
+    } catch (e: unknown) {
+      error = e as Error
+    }
   })
 
   await toPlainHandler(createApp().use(handler))(request)
+
+  if (error) {
+    throw error
+  }
 
   if (!event) {
     throw new Error('event was not found')
@@ -358,6 +368,63 @@ describe('useSession', () => {
 
     expect(store.touch).toHaveBeenCalledWith(sessionId, { hello: 'world' })
     spy.mockClear()
+  })
+
+  it('should handle the storage returning an error fetching an existing session', async () => {
+    const memory = MemoryDriver()
+    const store = new UnstorageSessionStore(
+      createStorage({ driver: memory }),
+    )
+    const secret = 'secret'
+    const sessionId = 'asdf123'
+    await store.set(sessionId, { hello: 'world' })
+    const cookie = `connect.sid=${await signCookie(sessionId, secret)}`
+
+    const _getItem = memory.getItem
+    memory.getItem = function() {
+      throw new Error('Something went wrong!')
+    }
+
+    // If getItem results in an error, an error should be thrown
+    // We should not fallback to an empty session as that could result in
+    // overriding existing session data.
+    await expect(testMiddleware({
+      path: '/',
+      method: 'GET',
+      headers: {
+        Cookie: cookie,
+      },
+    }, {
+      store,
+      secret,
+      saveUninitialized: true,
+      genid() {
+        return sessionId
+      },
+    })).rejects.toThrow()
+
+    memory.getItem = _getItem
+
+    // If a subsequent request for the session succeeds, the
+    // original data should still be present
+    const { context } = await testMiddleware({
+      path: '/',
+      method: 'GET',
+      headers: {
+        Cookie: cookie,
+      },
+    }, {
+      store,
+      secret,
+      saveUninitialized: true,
+      genid() {
+        return sessionId
+      },
+    })
+
+    expect(context.sessionId).toBeDefined()
+    // @ts-expect-error the session data is untyped
+    expect(context.session.data.hello).toEqual('world')
   })
 
   it('should sign the cookie header with the last secret in the array', async () => {
