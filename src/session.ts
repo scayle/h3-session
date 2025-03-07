@@ -28,27 +28,27 @@ export class Session implements SessionMethods {
     this.cookie = cookie
   }
 
-  get id() {
+  get id(): string {
     return this.#id
   }
 
-  async save() {
+  async save(): Promise<void> {
     await this.#store.set(this.#id, this.data)
   }
 
-  async reload() {
+  async reload(): Promise<void> {
     this.data = (await this.#store.get(this.#id)) ??
       (await this.#generate()).data
   }
 
-  async destroy() {
+  async destroy(): Promise<void> {
     // Delete the cookie by setting maxAge to 0
     this.cookie.maxAge = 0
 
     await this.#store.destroy(this.#id)
   }
 
-  async regenerate() {
+  async regenerate(): Promise<void> {
     await this.#store.destroy(this.#id)
     const { data, id } = await this.#generate()
 

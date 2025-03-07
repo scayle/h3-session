@@ -1,5 +1,5 @@
 import type { Storage } from 'unstorage'
-import type { RawSession, SessionStore } from './index'
+import type { RawSession, SessionDataT, SessionStore } from './index'
 
 type TTL = number | ((data: RawSession) => number)
 
@@ -34,7 +34,7 @@ export class UnstorageSessionStore implements SessionStore {
    * Get the session with the specified session ID
    * @param sid the un-prefixed session ID
    */
-  async get(sid: string) {
+  async get(sid: string): Promise<SessionDataT | undefined> {
     const item = await this.storage.getItem(this.getKey(sid))
 
     return item ?? undefined
@@ -46,7 +46,7 @@ export class UnstorageSessionStore implements SessionStore {
    * @param sid the un-prefixed session ID
    * @param data the session data
    */
-  async set(sid: string, data: RawSession) {
+  async set(sid: string, data: RawSession): Promise<void> {
     const ttl = this.getTTL(data)
 
     if (ttl > 0) {
@@ -61,7 +61,7 @@ export class UnstorageSessionStore implements SessionStore {
    * @param sid the un-prefixed session ID
    * @param data the session data
    */
-  async touch(sid: string, data: RawSession) {
+  async touch(sid: string, data: RawSession): Promise<void> {
     // For now, it seems the best way to bump the TTL through the unstorage
     // interface is by re-saving the data
     await this.set(sid, data)
@@ -70,7 +70,7 @@ export class UnstorageSessionStore implements SessionStore {
   /**
    * Remove all saved sessions
    */
-  async clear() {
+  async clear(): Promise<void> {
     // storage.clear does work when keys may contain a prefix
     // https://github.com/unjs/unstorage/issues/336
     const keys = await this.getAllKeys()
@@ -80,7 +80,7 @@ export class UnstorageSessionStore implements SessionStore {
   /**
    * Fetch all saved sessions.
    */
-  async all() {
+  async all(): Promise<SessionDataT[]> {
     const keys = await this.getAllKeys()
     const values = await this.storage.getItems(keys)
 
@@ -92,7 +92,7 @@ export class UnstorageSessionStore implements SessionStore {
   /**
    * Returns the number of saved sessions
    */
-  async length() {
+  async length(): Promise<number> {
     const keys = await this.getAllKeys()
     return keys.length
   }

@@ -165,7 +165,7 @@ export async function signCookie(
   return `s:${value}.${b64Signature}`
 }
 
-export function validateConfig(config: H3SessionOptions) {
+export function validateConfig(config: H3SessionOptions): void {
   if (!config.store) {
     throw new Error('[h3-session] Session store is required!')
   }
@@ -180,7 +180,10 @@ export function validateConfig(config: H3SessionOptions) {
  * @param event
  * @param config
  */
-export async function useSession(event: H3Event, config: H3SessionOptions) {
+export async function useSession(
+  event: H3Event,
+  config: H3SessionOptions,
+): Promise<void> {
   // Skip if session is already attached
   if (event.context.session) {
     return
