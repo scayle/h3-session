@@ -8,6 +8,10 @@
     "access": "public",
     "registry": "https://registry.npmjs.org/"
   },
+  "repository": {
+    "url": "git+https://github.com/scayle/h3-session.git"
+  },
+  "keywords": ["h3", "session"],
   "exports": {
     ".": "./dist/index.mjs"
   },
