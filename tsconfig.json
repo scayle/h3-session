@@ -9,7 +9,8 @@
     "declaration": true,
     "outDir": "./dist",
     "isolatedDeclarations": true,
-    "noCheck": true
+    "noCheck": true,
+    "erasableSyntaxOnly": true
   },
 
   "include": ["src/**/*.ts"]
