@@ -11,7 +11,12 @@ import type { H3SessionOptions } from './index'
 import { createStorage } from 'unstorage'
 import MemoryDriver from 'unstorage/drivers/memory'
 import type { H3Event, PlainRequest } from 'h3'
-import { toPlainHandler, createApp, defineEventHandler } from 'h3'
+import {
+  toPlainHandler,
+  createApp,
+  defineEventHandler,
+  getResponseHeaders,
+} from 'h3'
 import { parse } from 'cookie-es'
 
 describe('validateConfig', () => {
@@ -449,8 +454,9 @@ describe('useSession', () => {
       },
     })
 
+    const headers = getResponseHeaders(event)
     const parsedSetCookie = parse(
-      event.node.res.getHeaders()['set-cookie']?.[0] ?? '',
+      headers['set-cookie'] ?? '',
     )
     expect(parsedSetCookie['connect.sid']).toEqual(signedWithNew)
   })
@@ -475,11 +481,51 @@ describe('useSession', () => {
       },
     })
 
-    expect(event.node.res.getHeaders()['set-cookie']?.length).toEqual(1)
+    const initialCookie = getResponseHeaders(event)['set-cookie']
 
-    event.context.session.cookie.path = '/foo'
     event.context.session.cookie.expires = new Date(Date.now())
 
-    expect(event.node.res.getHeaders()['set-cookie']?.length).toEqual(3)
+    const newCookie = getResponseHeaders(event)['set-cookie']
+    expect(newCookie).to.not.equal(initialCookie)
+    expect(typeof newCookie).to.equal('string')
+  })
+
+  it('should not allow updating the cookie name, path or domain', async () => {
+    const store = new UnstorageSessionStore(
+      createStorage({ driver: MemoryDriver() }),
+    )
+    const secret = 'secret'
+    const sessionId = 'asdf123'
+
+    const event = await testMiddleware({
+      path: '/',
+      method: 'GET',
+      headers: {},
+    }, {
+      store,
+      secret,
+      saveUninitialized: true,
+      genid() {
+        return sessionId
+      },
+    })
+
+    expect(() => {
+      event.context.session.cookie.name = 'new-name'
+    }).toThrow(
+      new Error('[h3-session] Cannot change name on a session cookie!'),
+    )
+
+    expect(() => {
+      event.context.session.cookie.path = '/foo'
+    }).toThrow(
+      new Error('[h3-session] Cannot change path on a session cookie!'),
+    )
+
+    expect(() => {
+      event.context.session.cookie.domain = 'example.com'
+    }).toThrow(
+      new Error('[h3-session] Cannot change domain on a session cookie!'),
+    )
   })
 })

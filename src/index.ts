@@ -176,6 +176,14 @@ export function validateConfig(config: H3SessionOptions): void {
 }
 
 /**
+ * Changing the name, path or domain means the browser will store
+ * it as a new cookie rather than update the existing cookie.
+ *
+ * https://httpwg.org/specs/rfc6265.html#sane-set-cookie-semantics
+ */
+const uniqueCookieAttributes = new Set(['name', 'path', 'domain'])
+
+/**
  * Attach a session to an H3Event
  * @param event
  * @param config
@@ -238,7 +246,11 @@ export async function useSession(
     // We can't hook into the onBeforeResponse, so this is the best alternative
     return new Proxy(cookie, {
       set(target, property, value) {
-        // @ts-expect-error Implicitly has type any
+        if (uniqueCookieAttributes.has(property)) {
+          throw new Error(
+            `[h3-session] Cannot change ${property} on a session cookie!`,
+          )
+        }
         target[property] = value
         setCookie(event, sessionConfig.name, signedCookie, cookie)
         return true
