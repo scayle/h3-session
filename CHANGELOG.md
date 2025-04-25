@@ -1,5 +1,11 @@
 # @scayle/h3-session
 
+## 0.6.1
+
+### Patch Changes
+
+- Disallow setting `name`, `path` or `domain` on the session cookie. Setting these properties would result in a new cookie rather than updating the existing cookie. It is now blocked to prevent unexpected behavior.
+
 ## 0.6.0
 
 ### Minor Changes
