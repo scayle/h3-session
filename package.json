@@ -48,7 +48,7 @@
     "@arethetypeswrong/cli": "0.18.1",
     "@scayle/eslint-config-storefront": "4.5.2",
     "cookie-es": "2.0.0",
-    "dprint": "0.49.1",
+    "dprint": "0.50.0",
     "eslint": "9.27.0",
     "eslint-formatter-gitlab": "6.0.0",
     "h3": "1.15.3",
