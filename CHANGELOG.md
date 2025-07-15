@@ -16,7 +16,7 @@
 
 ### Patch Changes
 
-- When a sessionID exists, but there is no session data, re-use the sessionID instead of generating both new data and a new ID. This enables proper functioning of the `saveUnitialized` configuration.
+- When a sessionID exists, but there is no session data, re-use the sessionID instead of generating both new data and a new ID. This enables proper functioning of the `saveUninitialized` configuration.
 - Fix the `clear()` method on `UnstorageSessionStore` not clearing sessions
 
 ## 0.5.0

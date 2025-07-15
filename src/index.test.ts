@@ -317,7 +317,7 @@ describe('useSession', () => {
       },
     })
 
-    expect(await store.get(sessionId)).toEqual(undefined) // not saving unitialized
+    expect(await store.get(sessionId)).toEqual(undefined) // not saving uninitialized
 
     // @ts-expect-error the session data is untyped
     context.session.data.userId = '123'
@@ -326,7 +326,7 @@ describe('useSession', () => {
     expect(await store.get(sessionId)).toEqual({ userId: '123' })
   })
 
-  it('should save an empty session when saveUnitialized is true', async () => {
+  it('should save an empty session when saveUninitialized is true', async () => {
     const store = new UnstorageSessionStore(
       createStorage({ driver: MemoryDriver() }),
     )
