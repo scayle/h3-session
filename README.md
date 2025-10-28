@@ -143,12 +143,3 @@ declare module '@scayle/h3-session' {
 ## License
 
 Licensed under the [MIT License](https://opensource.org/license/mit/)
-
-<!-- Badges -->
-
-[npm-version-src]: https://img.shields.io/npm/v/@scayle/h3-session/latest.svg?style=flat&colorA=18181B&colorB=28CF8D
-[npm-version-href]: https://npmjs.com/package/@scayle/h3-session
-[npm-downloads-src]: https://img.shields.io/npm/dm/@scayle/h3-session.svg?style=flat&colorA=18181B&colorB=28CF8D
-[npm-downloads-href]: https://npmjs.com/package/@scayle/h3-session
-[license-src]: https://img.shields.io/npm/l/@scayle/h3-session.svg?style=flat&colorA=18181B&colorB=28CF8D
-[license-href]: https://npmjs.com/package/@scayle/h3-session
