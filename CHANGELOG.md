@@ -1,5 +1,11 @@
 # @scayle/h3-session
 
+## 0.6.2
+
+### Patch Changes
+
+- Cleaned up README.md and added CONTRIBUTING.md. No functional changes.
+
 ## 0.6.1
 
 ### Patch Changes

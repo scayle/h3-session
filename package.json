@@ -1,6 +1,6 @@
 {
   "name": "@scayle/h3-session",
-  "version": "0.6.1",
+  "version": "0.6.2",
   "description": "Persistent sessions for h3",
   "author": "SCAYLE Commerce Engine",
   "license": "MIT",
