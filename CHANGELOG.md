@@ -1,5 +1,13 @@
 # @scayle/h3-session
 
+## 0.6.3
+
+### Patch Changes
+
+- Updated dependency `defu@^6.1.4` to `defu@catalog:`
+- Updated dependency `uncrypto@^0.1.3` to `uncrypto@catalog:`
+- This is an internal change only. The packages now use the PNPM catalog feature to ensure dependencies use the identical version across packages.
+
 ## 0.6.2
 
 ### Patch Changes
