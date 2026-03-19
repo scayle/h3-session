@@ -53,7 +53,7 @@
     "dprint": "catalog:",
     "eslint-formatter-gitlab": "catalog:",
     "eslint": "catalog:",
-    "h3": "1.15.5",
+    "h3": "1.15.8",
     "typescript": "catalog:",
     "unbuild": "catalog:",
     "vitest": "catalog:"
