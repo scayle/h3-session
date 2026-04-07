@@ -49,7 +49,7 @@
     "@scayle/eslint-config-storefront": "workspace:*",
     "@scayle/vitest-config-storefront": "workspace:*",
     "@vitest/coverage-v8": "catalog:",
-    "cookie-es": "2.0.0",
+    "cookie-es": "2.0.1",
     "dprint": "catalog:",
     "eslint-formatter-gitlab": "catalog:",
     "eslint": "catalog:",
