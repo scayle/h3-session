@@ -50,7 +50,7 @@
     "cookie-es": "2.0.1",
     "eslint-formatter-gitlab": "catalog:",
     "eslint": "catalog:",
-    "h3": "1.15.10",
+    "h3": "1.15.11",
     "typescript": "catalog:",
     "unbuild": "catalog:",
     "vitest": "catalog:"
