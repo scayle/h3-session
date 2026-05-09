@@ -23,9 +23,13 @@ describe('unstorage-store', () => {
     const spy = vi.spyOn(storage, 'setItem')
     const store = new UnstorageSessionStore(storage, { ttl: 12345 })
     await store.set('123', { foo: 'bar' })
-    expect(spy).toHaveBeenCalledWith('sess:123', { foo: 'bar' }, {
-      ttl: 12345,
-    })
+    expect(spy).toHaveBeenCalledWith(
+      'sess:123',
+      { foo: 'bar' },
+      {
+        ttl: 12345,
+      },
+    )
   })
 
   it('should allow for a custom ttl function', async () => {
@@ -33,9 +37,13 @@ describe('unstorage-store', () => {
     const spy = vi.spyOn(storage, 'setItem')
     const store = new UnstorageSessionStore(storage, { ttl: () => 999 })
     await store.set('123', { foo: 'bar' })
-    expect(spy).toHaveBeenCalledWith('sess:123', { foo: 'bar' }, {
-      ttl: 999,
-    })
+    expect(spy).toHaveBeenCalledWith(
+      'sess:123',
+      { foo: 'bar' },
+      {
+        ttl: 999,
+      },
+    )
   })
 
   it('should remove the item if the ttl is zero', async () => {
@@ -86,8 +94,12 @@ describe('unstorage-store', () => {
     expect(await store.length()).toBe(2)
     await store.set('789', { foo: 'bar' })
     expect(await store.length()).toBe(3)
-    expect(await store.all()).toEqual([{ foo: 'bar' }, { foo: 'bar' }, {
-      foo: 'bar',
-    }])
+    expect(await store.all()).toEqual([
+      { foo: 'bar' },
+      { foo: 'bar' },
+      {
+        foo: 'bar',
+      },
+    ])
   })
 })

@@ -113,9 +113,7 @@ export async function unsignCookie(
   const encoder = new TextEncoder()
   const messageUint8Array = encoder.encode(message)
 
-  const signatureUint8Array = Uint8Array.from(
-    Buffer.from(signature, 'base64'),
-  )
+  const signatureUint8Array = Uint8Array.from(Buffer.from(signature, 'base64'))
 
   for (let i = 0; i < secrets.length; i++) {
     const cryptoKey = await getCryptoVerifyKey(secrets[i])

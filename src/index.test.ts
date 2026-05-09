@@ -21,8 +21,9 @@ import { parse } from 'cookie-es'
 
 describe('validateConfig', () => {
   it('should require store to be defined', () => {
-    expect(() => validateConfig({ secret: 'hello' } as H3SessionOptions))
-      .toThrow(new Error('[h3-session] Session store is required!'))
+    expect(() =>
+      validateConfig({ secret: 'hello' } as H3SessionOptions),
+    ).toThrow(new Error('[h3-session] Session store is required!'))
   })
 
   it('should require secret to be defined', () => {
@@ -36,16 +37,16 @@ describe('cookie signing', () => {
   describe('signCookie', () => {
     it('should throw an error if no value is provided', async () => {
       // @ts-expect-error - this function is intentionally being called incorrectly
-      await expect(signCookie())
-        .rejects
-        .toThrow(new Error('[h3-session] No value was provided!'))
+      await expect(signCookie()).rejects.toThrow(
+        new Error('[h3-session] No value was provided!'),
+      )
     })
 
     it('should throw an error if no secret is provided', async () => {
       // @ts-expect-error - this function is intentionally being called incorrectly
-      await expect(signCookie('hello'))
-        .rejects
-        .toThrow(new Error('[h3-session] No secret was provided!'))
+      await expect(signCookie('hello')).rejects.toThrow(
+        new Error('[h3-session] No secret was provided!'),
+      )
     })
 
     it('should match the expected format', async () => {
@@ -86,17 +87,14 @@ describe('cookie signing', () => {
       const id = randomUUID()
       expect(
         await unsignCookie(await signCookie(id, 'mySecret'), ['mySecret']),
-      )
-        .toEqual(id)
+      ).toEqual(id)
     }
     for (let i = 0; i < 100; i++) {
       const id = randomUUID()
       const digits = (i % 4) + 1
       const value = `${'1'.repeat(digits)}:${id}`
       expect(
-        await unsignCookie(await signCookie(value, 'mySecret'), [
-          'mySecret',
-        ]),
+        await unsignCookie(await signCookie(value, 'mySecret'), ['mySecret']),
       ).toEqual(value)
     }
   })
@@ -140,9 +138,7 @@ describe('cookie signing', () => {
       const digits = (i % 4) + 1
       const value = `${'1'.repeat(digits)}:${id}`
       expect(
-        await unsignCookie(await signCookie(value, 'mySecret1'), [
-          'mySecret2',
-        ]),
+        await unsignCookie(await signCookie(value, 'mySecret1'), ['mySecret2']),
       ).toBe(false)
     }
   })
@@ -157,7 +153,7 @@ async function testMiddleware(
   let event: H3Event | undefined
   let error: Error | undefined
 
-  const handler = defineEventHandler(async _event => {
+  const handler = defineEventHandler(async (_event) => {
     try {
       await useSession(_event, config)
       event = _event
@@ -187,7 +183,7 @@ describe('useSession', () => {
     const secret = 'secret'
     const genid = vi.fn().mockImplementation(() => 'testId')
 
-    const handler = defineEventHandler(async event => {
+    const handler = defineEventHandler(async (event) => {
       await useSession(event, { store, secret, genid })
       await useSession(event, { store, secret, genid })
     })
@@ -207,11 +203,14 @@ describe('useSession', () => {
     )
     const secret = 'secret'
 
-    const { context } = await testMiddleware({
-      path: '/',
-      method: 'GET',
-      headers: {},
-    }, { store, secret })
+    const { context } = await testMiddleware(
+      {
+        path: '/',
+        method: 'GET',
+        headers: {},
+      },
+      { store, secret },
+    )
 
     expect(context.sessionId).toBeDefined()
     expect(context.session).toBeDefined()
@@ -224,13 +223,16 @@ describe('useSession', () => {
     const secret = 'secret'
     const sessionId = 'asdf123'
 
-    const { context } = await testMiddleware({
-      method: 'GET',
-      path: '/hello/world',
-      headers: {
-        Cookie: `connect.sid=${await signCookie(sessionId, secret)}`,
+    const { context } = await testMiddleware(
+      {
+        method: 'GET',
+        path: '/hello/world',
+        headers: {
+          Cookie: `connect.sid=${await signCookie(sessionId, secret)}`,
+        },
       },
-    }, { store, secret })
+      { store, secret },
+    )
 
     expect(context.sessionId).toEqual(sessionId)
     expect(context.session).toBeDefined()
@@ -246,13 +248,16 @@ describe('useSession', () => {
 
     store.set(sessionId, { hello: 'world' })
 
-    const { context } = await testMiddleware({
-      method: 'GET',
-      path: '/hello/world',
-      headers: {
-        Cookie: `connect.sid=${await signCookie(sessionId, secret)}`,
+    const { context } = await testMiddleware(
+      {
+        method: 'GET',
+        path: '/hello/world',
+        headers: {
+          Cookie: `connect.sid=${await signCookie(sessionId, secret)}`,
+        },
       },
-    }, { store, secret })
+      { store, secret },
+    )
 
     expect(context.sessionId).toBeDefined()
     // @ts-expect-error the session data is untyped
@@ -265,17 +270,20 @@ describe('useSession', () => {
     )
     const secret = 'secret'
 
-    const { context } = await testMiddleware({
-      path: '/',
-      method: 'GET',
-      headers: {},
-    }, {
-      store,
-      secret,
-      generate() {
-        return { hello: 'world' }
+    const { context } = await testMiddleware(
+      {
+        path: '/',
+        method: 'GET',
+        headers: {},
       },
-    })
+      {
+        store,
+        secret,
+        generate() {
+          return { hello: 'world' }
+        },
+      },
+    )
 
     expect(context.sessionId).toBeDefined()
     expect(context.session).toBeDefined()
@@ -289,17 +297,20 @@ describe('useSession', () => {
     )
     const secret = 'secret'
 
-    const { context } = await testMiddleware({
-      path: '/',
-      method: 'GET',
-      headers: {},
-    }, {
-      store,
-      secret,
-      genid() {
-        return 'custom-id'
+    const { context } = await testMiddleware(
+      {
+        path: '/',
+        method: 'GET',
+        headers: {},
       },
-    })
+      {
+        store,
+        secret,
+        genid() {
+          return 'custom-id'
+        },
+      },
+    )
     expect(context.sessionId).toEqual('custom-id')
     expect(context.session).toBeDefined()
   })
@@ -311,17 +322,20 @@ describe('useSession', () => {
     const secret = 'secret'
     const sessionId = 'asdf123'
 
-    const { context } = await testMiddleware({
-      path: '/',
-      method: 'GET',
-      headers: {},
-    }, {
-      store,
-      secret,
-      genid() {
-        return sessionId
+    const { context } = await testMiddleware(
+      {
+        path: '/',
+        method: 'GET',
+        headers: {},
       },
-    })
+      {
+        store,
+        secret,
+        genid() {
+          return sessionId
+        },
+      },
+    )
 
     expect(await store.get(sessionId)).toEqual(undefined) // not saving uninitialized
 
@@ -339,18 +353,21 @@ describe('useSession', () => {
     const secret = 'secret'
     const sessionId = 'asdf123'
 
-    await testMiddleware({
-      path: '/',
-      method: 'GET',
-      headers: {},
-    }, {
-      store,
-      secret,
-      saveUninitialized: true,
-      genid() {
-        return sessionId
+    await testMiddleware(
+      {
+        path: '/',
+        method: 'GET',
+        headers: {},
       },
-    })
+      {
+        store,
+        secret,
+        saveUninitialized: true,
+        genid() {
+          return sessionId
+        },
+      },
+    )
 
     expect(await store.get(sessionId)).toEqual({})
   })
@@ -365,17 +382,20 @@ describe('useSession', () => {
 
     await store.set(sessionId, { hello: 'world' })
 
-    await testMiddleware({
-      path: '/',
-      method: 'GET',
-      headers: {
-        Cookie: `connect.sid=${await signCookie(sessionId, secret)}`,
+    await testMiddleware(
+      {
+        path: '/',
+        method: 'GET',
+        headers: {
+          Cookie: `connect.sid=${await signCookie(sessionId, secret)}`,
+        },
       },
-    }, {
-      store,
-      secret,
-      saveUninitialized: true,
-    })
+      {
+        store,
+        secret,
+        saveUninitialized: true,
+      },
+    )
 
     expect(store.touch).toHaveBeenCalledWith(sessionId, { hello: 'world' })
     spy.mockClear()
@@ -383,55 +403,61 @@ describe('useSession', () => {
 
   it('should handle the storage returning an error fetching an existing session', async () => {
     const memory = MemoryDriver()
-    const store = new UnstorageSessionStore(
-      createStorage({ driver: memory }),
-    )
+    const store = new UnstorageSessionStore(createStorage({ driver: memory }))
     const secret = 'secret'
     const sessionId = 'asdf123'
     await store.set(sessionId, { hello: 'world' })
     const cookie = `connect.sid=${await signCookie(sessionId, secret)}`
 
     const _getItem = memory.getItem
-    memory.getItem = function() {
+    memory.getItem = function () {
       throw new Error('Something went wrong!')
     }
 
     // If getItem results in an error, an error should be thrown
     // We should not fallback to an empty session as that could result in
     // overriding existing session data.
-    await expect(testMiddleware({
-      path: '/',
-      method: 'GET',
-      headers: {
-        Cookie: cookie,
-      },
-    }, {
-      store,
-      secret,
-      saveUninitialized: true,
-      genid() {
-        return sessionId
-      },
-    })).rejects.toThrow()
+    await expect(
+      testMiddleware(
+        {
+          path: '/',
+          method: 'GET',
+          headers: {
+            Cookie: cookie,
+          },
+        },
+        {
+          store,
+          secret,
+          saveUninitialized: true,
+          genid() {
+            return sessionId
+          },
+        },
+      ),
+    ).rejects.toThrow()
 
     memory.getItem = _getItem
 
     // If a subsequent request for the session succeeds, the
     // original data should still be present
-    const { context } = await testMiddleware({
-      path: '/',
-      method: 'GET',
-      headers: {
-        Cookie: cookie,
+    const { context } = await testMiddleware(
+      {
+        path: '/',
+        method: 'GET',
+        headers: {
+          Cookie: cookie,
+        },
       },
-    }, {
-      store,
-      secret,
-      saveUninitialized: true,
-      genid() {
-        return sessionId
+      {
+        store,
+        secret,
+        saveUninitialized: true,
+        genid() {
+          return sessionId
+        },
       },
-    })
+    )
 
     expect(context.sessionId).toBeDefined()
     // @ts-expect-error the session data is untyped
@@ -447,23 +473,24 @@ describe('useSession', () => {
 
     const signedWithNew = await signCookie(sessionId, secrets[1])
 
-    const event = await testMiddleware({
-      path: '/',
-      method: 'GET',
-      headers: {},
-    }, {
-      store,
-      secret: secrets,
-      saveUninitialized: true,
-      genid() {
-        return sessionId
+    const event = await testMiddleware(
+      {
+        path: '/',
+        method: 'GET',
+        headers: {},
       },
-    })
+      {
+        store,
+        secret: secrets,
+        saveUninitialized: true,
+        genid() {
+          return sessionId
+        },
+      },
+    )
 
     const headers = getResponseHeaders(event)
-    const parsedSetCookie = parse(
-      headers['set-cookie'] ?? '',
-    )
+    const parsedSetCookie = parse(headers['set-cookie'] ?? '')
     expect(parsedSetCookie['connect.sid']).toEqual(signedWithNew)
   })
 
@@ -474,18 +501,21 @@ describe('useSession', () => {
     const secret = 'secret'
     const sessionId = 'asdf123'
 
-    const event = await testMiddleware({
-      path: '/',
-      method: 'GET',
-      headers: {},
-    }, {
-      store,
-      secret,
-      saveUninitialized: true,
-      genid() {
-        return sessionId
+    const event = await testMiddleware(
+      {
+        path: '/',
+        method: 'GET',
+        headers: {},
       },
-    })
+      {
+        store,
+        secret,
+        saveUninitialized: true,
+        genid() {
+          return sessionId
+        },
+      },
+    )
 
     const initialCookie = getResponseHeaders(event)['set-cookie']
 
@@ -503,18 +533,21 @@ describe('useSession', () => {
     const secret = 'secret'
     const sessionId = 'asdf123'
 
-    const event = await testMiddleware({
-      path: '/',
-      method: 'GET',
-      headers: {},
-    }, {
-      store,
-      secret,
-      saveUninitialized: true,
-      genid() {
-        return sessionId
+    const event = await testMiddleware(
+      {
+        path: '/',
+        method: 'GET',
+        headers: {},
       },
-    })
+      {
+        store,
+        secret,
+        saveUninitialized: true,
+        genid() {
+          return sessionId
+        },
+      },
+    )
 
     expect(() => {
       event.context.session.cookie.name = 'new-name'
