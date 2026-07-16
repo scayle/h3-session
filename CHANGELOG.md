@@ -1,5 +1,11 @@
 # @scayle/h3-session
 
+## 0.7.1
+
+### Patch Changes
+
+- Updated dependency `unstorage@^1.10.2` to `unstorage@catalog:`
+
 ## 0.7.0
 
 ### Minor Changes
