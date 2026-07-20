@@ -1,5 +1,11 @@
 # @scayle/h3-session
 
+## 0.7.2
+
+### Patch Changes
+
+- Updated underlying minor dependencies. No behavior changes.
+
 ## 0.7.1
 
 ### Patch Changes
