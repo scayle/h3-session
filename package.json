@@ -47,7 +47,7 @@
     "@scayle/eslint-config-storefront": "catalog:",
     "@scayle/vitest-config-storefront": "workspace:*",
     "@vitest/coverage-v8": "catalog:",
-    "cookie-es": "2.0.1",
+    "cookie-es": "3.1.1",
     "eslint-formatter-gitlab": "catalog:",
     "eslint": "catalog:",
     "h3": "catalog:",
